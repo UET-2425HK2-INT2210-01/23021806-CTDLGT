@@ -1,34 +1,46 @@
 #include <iostream>
 using namespace std;
 
-int max(int a, int b){ return (a > b) ? a : b; }
+// Hàm trộn 2 mảng con đã được sắp xếp
+void merge(int a[], int l, int m, int r){
+    int n1 = m - l + 1; // Số phần tử mảng trái
+    int n2 = r - m;     // Số phần tử mảng phải
 
-// Hàm giải bài toán cái túi bằng quy hoạch động
-int knapsack(int weights[], int values[], int n, int X){
-    int dp[101][101]; // dp[i][w]: max giá trị với i đồ vật và sức chứa w
+    int L[n1], R[n2]; // Tạo mảng tạm
 
-    for (int i = 0; i <= n; i++){
-        for (int w = 0; w <= X; w++){
-            if (i == 0 || w == 0)
-                dp[i][w] = 0;
-            else if (weights[i - 1] <= w)
-                dp[i][w] = max(values[i - 1] + dp[i - 1][w - weights[i - 1]], dp[i - 1][w]);
-            else
-                dp[i][w] = dp[i - 1][w];
-        }
+    for (int i = 0; i < n1; i++) L[i] = a[l + i]; // Copy dữ liệu vào mảng trái
+    for (int i = 0; i < n2; i++) R[i] = a[m + 1 + i]; // Copy dữ liệu vào mảng phải
+
+    int i = 0, j = 0, k = l; 
+
+    // Trộn mảng trái và phải
+    while (i < n1 && j < n2){
+        if (L[i] <= R[j]) a[k++] = L[i++];
+        else a[k++] = R[j++];
     }
 
-    return dp[n][X]; // kết quả cuối cùng
+    // Sao chép phần còn lại nếu có
+    while (i < n1) a[k++] = L[i++];
+    while (j < n2) a[k++] = R[j++];
+}
+
+// Hàm merge sort chính
+void mergeSort(int a[], int l, int r){
+    if (l < r){
+        int m = (l + r) / 2; 
+        mergeSort(a, l, m);  // Gọi đệ quy mảng trái
+        mergeSort(a, m + 1, r); // Gọi đệ quy mảng phải
+        merge(a, l, m, r); // Trộn 2 mảng con
+    }
 }
 
 int main(){
-    int n, X;
-    cin >> n >> X;
-    int weights[100], values[100];
-    for (int i = 0; i < n; i++){
-        cin >> weights[i] >> values[i]; // Nhập trọng lượng và giá trị
-    }
+    int n;
+    cin >> n;
+    int a[n];
+    for (int i = 0; i < n; i++) cin >> a[i];
 
-    cout << knapsack(weights, values, n, X) << endl;
-    return 0;
+    mergeSort(a, 0, n - 1);
+
+    for (int i = 0; i < n; i++) cout << a[i] << " ";
 }
