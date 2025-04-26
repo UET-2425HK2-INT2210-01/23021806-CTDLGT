@@ -1,25 +1,37 @@
 #include <iostream>
 using namespace std;
 
-// Hàm đệ quy kiểm tra có tồn tại tập con có tổng bằng target
-bool subsetSum(int arr[], int n, int target){
-    if (target == 0) return true;          // Tổng = 0 => tồn tại
-    if (n == 0) return false;              // Không còn phần tử để xét
-    if (arr[n-1] > target)                 // Bỏ qua nếu phần tử lớn hơn target
-        return subsetSum(arr, n - 1, target);
-    return subsetSum(arr, n - 1, target) || subsetSum(arr, n - 1, target - arr[n - 1]);
+// Hàm phân hoạch theo Hoare
+int partitionHoare(int a[], int l, int r){
+    int pivot = a[l]; // Pivot là phần tử đầu
+    int i = l - 1, j = r + 1; // i đi từ trái, j đi từ phải
+
+    while (true){
+        do{ i++; } while (a[i] < pivot); // Tìm phần tử >= pivot bên trái
+        do{ j--; } while (a[j] > pivot); // Tìm phần tử <= pivot bên phải
+
+        if (i >= j) return j; // Nếu i >= j, trả về vị trí phân chia
+
+        int temp = a[i]; a[i] = a[j]; a[j] = temp; // Hoán đổi a[i] và a[j]
+    }
+}
+
+// Hàm quick sort
+void quickSortHoare(int a[], int l, int r){
+    if (l < r){
+        int pi = partitionHoare(a, l, r); // Chia mảng
+        quickSortHoare(a, l, pi); // Đệ quy mảng bên trái
+        quickSortHoare(a, pi + 1, r); // Đệ quy mảng bên phải
+    }
 }
 
 int main(){
-    int n, X;
-    cin >> n >> X;                         // Nhập n và X
-    int arr[100];                          // Mảng chứa tuổi sinh viên
-    for (int i = 0; i < n; i++){
-        cin >> arr[i];                     // Nhập từng tuổi
-    }
+    int n;
+    cin >> n;
+    int a[n];
+    for (int i = 0; i < n; i++) cin >> a[i];
 
-    if (subsetSum(arr, n, X)) cout << "YES" << endl;
-    else cout << "NO" << endl;
+    quickSortHoare(a, 0, n - 1);
 
-    return 0;
+    for (int i = 0; i < n; i++) cout << a[i] << " ";
 }
