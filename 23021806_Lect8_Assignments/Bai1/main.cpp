@@ -1,52 +1,38 @@
-#include <iostream> 
+#include <iostream>
 using namespace std;
 
-// Hàm hoán đổi 2 số thực
-void swap(double &a, double &b){
-    double temp = a; 
-    a = b;           
-    b = temp;        
-}
+// Hàm phân hoạch theo Lomuto
+int partitionLomuto(int a[], int l, int r){
+    int pivot = a[r]; // Pivot chọn phần tử cuối
+    int i = l - 1;    // Vị trí của phần tử nhỏ hơn pivot
 
-// Hàm phân hoạch mảng cho quicksort
-int partition(double arr[], int low, int high){
-    double pivot = arr[high]; 
-    int i = low - 1;          
-
-    for (int j = low; j < high; j++){ 
-        if (arr[j] < pivot){          // Nếu phần tử nhỏ hơn pivot
-            i++;                       // Tăng chỉ số vùng nhỏ
-            swap(arr[i], arr[j]);     // Đưa phần tử nhỏ về đầu
+    for (int j = l; j < r; j++){
+        if (a[j] <= pivot){
+            i++;
+            int temp = a[i]; a[i] = a[j]; a[j] = temp; // Hoán đổi a[i] và a[j]
         }
     }
-    swap(arr[i + 1], arr[high]); // Đưa pivot về đúng vị trí
-    return i + 1;                // Trả về chỉ số pivot
+
+    int temp = a[i + 1]; a[i + 1] = a[r]; a[r] = temp; // Đưa pivot vào đúng chỗ
+    return i + 1; // Trả về chỉ số pivot mới
 }
 
-// Hàm quicksort đệ quy
-void quickSort(double arr[], int low, int high){
-    if (low < high){                             // Nếu vùng cần sắp xếp hợp lệ
-        int pi = partition(arr, low, high);       // Tìm vị trí phân hoạch
-        quickSort(arr, low, pi - 1);              // Sắp xếp nửa bên trái
-        quickSort(arr, pi + 1, high);             // Sắp xếp nửa bên phải
+// Hàm quick sort
+void quickSortLomuto(int a[], int l, int r){
+    if (l < r){
+        int pi = partitionLomuto(a, l, r); // Chia mảng
+        quickSortLomuto(a, l, pi - 1); // Đệ quy bên trái
+        quickSortLomuto(a, pi + 1, r); // Đệ quy bên phải
     }
 }
 
 int main(){
     int n;
-    cin >> n;                     
+    cin >> n;
+    int a[n];
+    for (int i = 0; i < n; i++) cin >> a[i];
 
-    double arr[1000];             
-    for (int i = 0; i < n; i++){
-        cin >> arr[i];            
-    }
+    quickSortLomuto(a, 0, n - 1);
 
-    quickSort(arr, 0, n - 1);     
-
-    for (int i = 0; i < n; i++){
-        cout << arr[i];        
-        if (i != n - 1) cout << " "; 
-    }
-    cout << endl;                
-    return 0;                     
+    for (int i = 0; i < n; i++) cout << a[i] << " ";
 }
